@@ -1,0 +1,181 @@
+{
+  "app": {
+    "name": "DS Prime",
+    "version": "3.0.0",
+    "description": "DeepSeek AI 智能体工作台 - 支持多用户、工作区管理、工作流编排"
+  },
+  "api": {
+    "deepseek": {
+      "base_url": "https://api.deepseek.com",
+      "base_url_anthropic": "https://api.deepseek.com/anthropic",
+      "default_model": "deepseek-v4-flash",
+      "max_tokens": 8192,
+      "temperature": 0.7,
+      "stream": true,
+      "thinking": { "type": "enabled" },
+      "reasoning_effort": "high"
+    },
+    "models": [
+      {
+        "id": "deepseek-v4-flash",
+        "name": "DeepSeek V4-Flash",
+        "version": "V4-Flash-0731",
+        "params": "284B MoE / 13B 激活",
+        "context_length": 1000000,
+        "max_output": 393216,
+        "thinking_mode": true,
+        "price_input_cache_hit": "0.02元/M",
+        "price_input_cache_miss": "1元/M",
+        "price_output": "2元/M",
+        "concurrency_limit": 2500,
+        "features": ["json_output", "tool_calls", "prefix_completion", "fim_completion"],
+        "description": "快速响应、高性价比，适合日常对话、代码生成、分类任务"
+      },
+      {
+        "id": "deepseek-v4-pro",
+        "name": "DeepSeek V4-Pro",
+        "version": "V4-Pro (Preview)",
+        "context_length": 1000000,
+        "max_output": 393216,
+        "thinking_mode": true,
+        "price_input_cache_hit": "0.025元/M",
+        "price_input_cache_miss": "3元/M",
+        "price_output": "6元/M",
+        "concurrency_limit": 500,
+        "features": ["json_output", "tool_calls", "prefix_completion", "fim_completion"],
+        "description": "强力推理能力，适合复杂推理、Agent任务、深度分析"
+      },
+      {
+        "id": "deepseek-chat",
+        "name": "DeepSeek Chat (兼容)",
+        "version": "→ V4-Flash 非思考模式",
+        "deprecated": "2026-07-24",
+        "thinking_mode": false,
+        "description": "兼容旧版别名，映射到 V4-Flash 非思考模式"
+      },
+      {
+        "id": "deepseek-reasoner",
+        "name": "DeepSeek Reasoner (兼容)",
+        "version": "→ V4-Flash 思考模式",
+        "deprecated": "2026-07-24",
+        "thinking_mode": true,
+        "description": "兼容旧版别名，映射到 V4-Flash 思考模式"
+      }
+    ]
+  },
+  "auth": {
+    "require_email_verification": false,
+    "session_timeout_minutes": 480,
+    "max_login_attempts": 5
+  },
+  "workspace": {
+    "root_path": "/workspace",
+    "default_folders": ["documents", "code", "data", "artifacts", "exports"],
+    "max_file_size_mb": 50,
+    "allowed_extensions": [
+      ".txt", ".md", ".json", ".csv", ".xml", ".yaml", ".yml",
+      ".py", ".js", ".ts", ".html", ".css", ".scss", ".java",
+      ".go", ".rs", ".cpp", ".c", ".h", ".rb", ".php", ".sql",
+      ".pdf", ".doc", ".docx", ".xlsx", ".pptx",
+      ".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp"
+    ]
+  },
+  "workflow": {
+    "max_steps": 20,
+    "default_statuses": ["pending", "in_progress", "review", "done", "archived"],
+    "default_priorities": ["low", "medium", "high", "urgent"]
+  },
+  "skills": [
+    {
+      "id": "file_reader", "name": "文件读取", "icon": "file",
+      "description": "读取并解析多种文件格式的内容",
+      "parameters": {
+        "type": "object",
+        "properties": { "file_path": { "type": "string", "description": "文件路径" } },
+        "required": ["file_path"]
+      }
+    },
+    {
+      "id": "web_search", "name": "网络搜索", "icon": "search",
+      "description": "在互联网上搜索最新信息",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": { "type": "string", "description": "搜索关键词" },
+          "num": { "type": "integer", "description": "结果数量", "default": 5 }
+        },
+        "required": ["query"]
+      }
+    },
+    {
+      "id": "web_fetch", "name": "网页抓取", "icon": "globe",
+      "description": "获取指定 URL 的网页内容",
+      "parameters": {
+        "type": "object",
+        "properties": { "url": { "type": "string", "description": "网页URL" } },
+        "required": ["url"]
+      }
+    },
+    {
+      "id": "code_executor", "name": "代码执行", "icon": "code",
+      "description": "在沙箱中执行 Python/JavaScript 代码",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "language": { "type": "string", "enum": ["python", "javascript"] },
+          "code": { "type": "string", "description": "代码内容" }
+        },
+        "required": ["language", "code"]
+      }
+    },
+    {
+      "id": "text_analyzer", "name": "文本分析", "icon": "chart",
+      "description": "情感分析、关键词提取、摘要生成",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "text": { "type": "string", "description": "文本内容" },
+          "analysis_type": {
+            "type": "string",
+            "enum": ["sentiment", "keywords", "summary", "all"]
+          }
+        },
+        "required": ["text"]
+      }
+    },
+    {
+      "id": "file_writer", "name": "文件写入", "icon": "save",
+      "description": "将内容写入到指定文件",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "file_path": { "type": "string", "description": "目标路径" },
+          "content": { "type": "string", "description": "写入内容" }
+        },
+        "required": ["file_path", "content"]
+      }
+    }
+  ],
+  "mcp_servers": [
+    {
+      "id": "filesystem", "name": "文件系统", "enabled": true,
+      "description": "本地文件系统操作",
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-server-filesystem", "/workspace"]
+    },
+    {
+      "id": "web_browser", "name": "网页浏览器", "enabled": false,
+      "description": "自动化网页浏览与内容抓取",
+      "transport": "http",
+      "url": "http://localhost:3001/mcp"
+    }
+  ],
+  "ui": {
+    "theme": "light",
+    "language": "zh-CN",
+    "sidebar_width": 260,
+    "inspector_width": 300,
+    "font_size": 14
+  }
+}
